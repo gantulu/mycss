@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { type ReactNode } from "react";
 
 const categories = [
   "Fashion",
@@ -51,11 +50,17 @@ const products = [
   },
 ];
 
-export default function App() {
+type LayoutMode = "app" | "standalone";
+
+type AppProps = {
+  layout?: LayoutMode;
+};
+
+export default function App({ layout = "app" }: AppProps) {
   return (
     <>
       <style>{`
-        /* Layout Baseline V1: full-height app with independently scrollable content */
+        /* Layout Baseline V1: 100% height, no viewport-height units */
 
         html,
         body,
@@ -76,7 +81,16 @@ export default function App() {
           color: #222;
         }
 
-        main {
+        .app-shell {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          min-height: 0;
+          overflow: hidden;
+        }
+
+        .app-main,
+        .standalone-main {
           flex: 1;
           min-height: 0;
           overflow-y: auto;
@@ -84,6 +98,7 @@ export default function App() {
         }
 
         .app-header {
+          flex-shrink: 0;
           padding: 16px;
           border-bottom: 1px solid #e5e7eb;
           display: flex;
@@ -255,6 +270,7 @@ export default function App() {
         }
 
         .app-footer {
+          flex-shrink: 0;
           padding: 16px;
           border-top: 1px solid #e5e7eb;
           text-align: center;
@@ -268,6 +284,7 @@ export default function App() {
         }
 
         .bottom-nav {
+          flex-shrink: 0;
           display: flex;
           align-items: center;
           justify-content: space-around;
@@ -287,90 +304,111 @@ export default function App() {
         }
       `}</style>
 
+      {layout === "standalone" ? (
+        <StandalonePage>
+          <StorefrontContent />
+        </StandalonePage>
+      ) : (
+        <AppShell>
+          <StorefrontContent />
+        </AppShell>
+      )}
+    </>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
+  return (
+    <div className="app-shell">
       <header className="app-header">
         <h1>My App</h1>
-
         <div className="header-actions">
           <button type="button">Cart</button>
           <button type="button">Profile</button>
         </div>
       </header>
 
-      <main>
-        <section className="content">
+      <main className="app-main">{children}</main>
 
-          <input
-            className="search-bar"
-            type="search"
-            placeholder="Cari produk, merek, dan lainnya..."
-          />
-
-          <section className="banner">
-            <h2>Big Sale!</h2>
-            <p>Temukan produk favorit dengan harga terbaik.</p>
-          </section>
-
-          <section className="section">
-            <div className="section-title">
-              <h2>Kategori</h2>
-              <span>Lihat Semua</span>
-            </div>
-
-            <div className="category-grid">
-              {categories.map((category, index) => (
-                <div className="category-item" key={category}>
-                  <div className="category-icon">
-                    {["👗", "📱", "💄", "👟", "👜", "⌚", "🏠", "•••"][index]}
-                  </div>
-                  {category}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="section">
-            <div className="section-title">
-              <h2>⚡ Flash Sale</h2>
-              <span>Lihat Semua</span>
-            </div>
-
-            <div className="product-grid">
-              {products.slice(0, 2).map((product) => (
-                <ProductCard key={product.name} product={product} />
-              ))}
-            </div>
-          </section>
-
-          <section className="section">
-            <div className="section-title">
-              <h2>Rekomendasi Untukmu</h2>
-              <span>Lihat Semua</span>
-            </div>
-
-            <div className="product-grid">
-              {products.map((product) => (
-                <ProductCard key={product.name} product={product} />
-              ))}
-            </div>
-          </section>
-
-        </section>
-
-        <footer className="app-footer">
-          <p>© 2026 My App</p>
-        </footer>
-      </main>
+      <footer className="app-footer">
+        <p>© 2026 My App</p>
+      </footer>
 
       <nav className="bottom-nav">
         <button type="button">Home</button>
         <button type="button">Catalog</button>
         <button type="button">Livechat</button>
       </nav>
-    </>
+    </div>
   );
 }
 
-function ProductCard({ product }: { product: typeof products[number] }) {
+export function StandalonePage({ children }: { children: ReactNode }) {
+  return <main className="standalone-main">{children}</main>;
+}
+
+function StorefrontContent() {
+  return (
+    <section className="content">
+      <input
+        className="search-bar"
+        type="search"
+        placeholder="Cari produk, merek, dan lainnya..."
+      />
+
+      <section className="banner">
+        <h2>Big Sale!</h2>
+        <p>Temukan produk favorit dengan harga terbaik.</p>
+      </section>
+
+      <section className="section">
+        <div className="section-title">
+          <h2>Kategori</h2>
+          <span>Lihat Semua</span>
+        </div>
+
+        <div className="category-grid">
+          {categories.map((category, index) => (
+            <div className="category-item" key={category}>
+              <div className="category-icon">
+                {["👗", "📱", "💄", "👟", "👜", "⌚", "🏠", "•••"][index]}
+              </div>
+              {category}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-title">
+          <h2>⚡ Flash Sale</h2>
+          <span>Lihat Semua</span>
+        </div>
+
+        <div className="product-grid">
+          {products.slice(0, 2).map((product) => (
+            <ProductCard key={product.name} product={product} />
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-title">
+          <h2>Rekomendasi Untukmu</h2>
+          <span>Lihat Semua</span>
+        </div>
+
+        <div className="product-grid">
+          {products.map((product) => (
+            <ProductCard key={product.name} product={product} />
+          ))}
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ProductCard({ product }: { product: (typeof products)[number] }) {
   return (
     <article className="product-card">
       <img
@@ -382,15 +420,11 @@ function ProductCard({ product }: { product: typeof products[number] }) {
       <div className="product-info">
         <p className="product-name">{product.name}</p>
 
-        <div className="product-price">
-          {product.price}
-        </div>
+        <div className="product-price">{product.price}</div>
 
         <div className="product-old-price">
           {product.oldPrice}
-          <span className="product-discount">
-            -{product.discount}
-          </span>
+          <span className="product-discount">-{product.discount}</span>
         </div>
 
         <div className="product-meta">

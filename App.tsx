@@ -83,7 +83,9 @@ export default function App({ layout = "app" }: AppProps) {
 
         .app-shell {
           display: flex;
-          flex: 1;
+          width: 100%;
+          height: 100%;
+          flex: 1 1 0%;
           flex-direction: column;
           min-height: 0;
           overflow: hidden;
@@ -91,7 +93,7 @@ export default function App({ layout = "app" }: AppProps) {
 
         .app-main,
         .standalone-main {
-          flex: 1;
+          flex: 1 1 0%;
           min-height: 0;
           overflow-y: auto;
           overflow-x: hidden;
